@@ -27,39 +27,39 @@ export default function Menu() {
    ----------------------------*/
   async function fetchMenuData() {
   try {
-    const res = await apiMenu.get("/products");
+    const res = await fetch("https://dummyjson.com/recipes");
+    const data = await res.json();
 
-    const mapped = res.data.products.map((p) => ({
-      name: p.title,
-      info: p.description,
-      img: p.thumbnail,
-      category: mapApiCategory(p.category),
+    const mapped = data.recipes.map((r) => ({
+      name: r.name,
+      info: r.instructions?.[0] || "Delicious recipe",
+      img: r.image,
+      category: mapApiCategory(r.cuisine || r.mealType || "general"),
     }));
 
     setMenuData(mapped);
     setFilteredItems(mapped);
-
   } catch (err) {
     console.error("Menu API Error:", err);
+    setMenuData([]);
+    setFilteredItems([]);
   }
 }
 
+
   /** Map dummy categories to your 3 categories */
   function mapApiCategory(cat) {
-    const c = cat.toLowerCase();
+  const c = cat.toLowerCase();
 
-    if (["phone", "laptop", "tops", "shirts", "sunglasses"].some((x) => c.includes(x)))
-      return "Appetizers";
+  if (["italian", "indian", "mexican"].some(x => c.includes(x)))
+    return "Main";
 
-    if (["home", "decoration", "furniture", "automotive", "motorcycle", "lighting"]
-      .some((x) => c.includes(x)))
-      return "Main";
+  if (["dessert", "sweet", "cake"].some(x => c.includes(x)))
+    return "Desserts";
 
-    if (["fragrance", "skincare"].some((x) => c.includes(x)))
-      return "Desserts";
+  return "Appetizers"; // default
+}
 
-    return "Appetizers"; // default
-  }
 
   return (
     <div className="d-flex flex-column vh-100 bg-light">
