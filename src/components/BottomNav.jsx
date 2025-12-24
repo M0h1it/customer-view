@@ -1,21 +1,43 @@
 import { FaBookOpen, FaReceipt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { CustomerAPI } from "../api/customer.api";
 
 export default function BottomNav() {
   const [activeTab, setActiveTab] = useState("menu");
   const [showWaiterModal, setShowWaiterModal] = useState(false);
   const [showBillModal, setShowBillModal] = useState(false);
+  const tableId = localStorage.getItem("DEVICE_TABLE");
   const navigate = useNavigate();
 
-  const handleWaiterClick = () => {
+  const handleWaiterClick = async () => {
     setActiveTab("waiter");
-    setShowWaiterModal(true);
+    if (!tableId) {
+      alert("Table ID not found");
+      return;
+    }
+
+    try {
+      await CustomerAPI.callWaiter(tableId);
+      setShowWaiterModal(true);
+    } catch {
+      alert("Failed to notify waiter");
+    }
   };
 
-  const handleBillClick = () => {
+  const handleBillClick = async () => {
     setActiveTab("bill");
-    setShowBillModal(true);
+    if (!tableId) {
+      alert("Table ID not found");
+      return;
+    }
+
+    try {
+      await CustomerAPI.askForBill(tableId);
+      setShowBillModal(true);
+    } catch {
+      alert("Failed to request bill");
+    }
   };
 
   return (
